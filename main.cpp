@@ -138,7 +138,6 @@ bool juegoTerminado(string tablero[6][7],int columna)
 
         if(tablero[fila][i]==" X ")
         {
-            cout<<"La columna se modifico"<<endl;
             inicioCol=i;
         }
         else if(tablero[fila][i]==" * ")break;
@@ -177,9 +176,33 @@ bool juegoTerminado(string tablero[6][7],int columna)
         }
     }
     if(cant==4)return true;
+
+    //Diagonal "/"
+    cant=0;
+    inicioFil=fila;
+    inicioCol=columna;
+
+    for (int i = columna; i >= 0; i--)
+    {
+        if(tablero[inicioFil][inicioCol]==" X ")
+        {
+            cout<<inicioCol<<" "<<inicioFil<<endl;
+            inicioFil+=1;
+            inicioCol-=1;
+            
+        }
+        else if(tablero[inicioFil][inicioCol]==" * ")break;
+    }
+    cout<<"Inicio de fila "<<inicioFil<<" Inicio de columna "<<inicioFil<<endl;
+
+
+
     if(columna == 6)return true;
     
+
+
     return false;
+
 }
 
 bool evaluarTablero(string tablero[6][7],int columna)
