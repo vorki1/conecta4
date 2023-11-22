@@ -4,8 +4,8 @@ using namespace std;
 void rellenar(string tablero[6][7]);
 void imprimirTablero(string tablero[6][7]);
 void comenzarJuego(string,string tablero[6][7]);
-void ingresarFicha(string tablero[6][7],int);
-bool juegoTerminado(string tablero[6][7],int);
+void ingresarFicha(string tablero[6][7],int,int);
+bool juegoTerminado(string tablero[6][7],int,int);
 bool evaluarTablero(string tablero[6][7], int);
 
 int main()
@@ -87,6 +87,8 @@ void comenzarJuego(string dificultad,string tablero[6][7])
 {
     bool bandera = true;
     int columna;
+    int jugador = 1;
+
     do
     {
         imprimirTablero(tablero);
@@ -95,21 +97,32 @@ void comenzarJuego(string dificultad,string tablero[6][7])
         if(columna < 1 || columna > 7)cout<<"La columna ingresada es invalida."<<endl;
         else
         {
-            ingresarFicha(tablero,columna-1);
-            if(juegoTerminado(tablero,columna-1)) bandera=false;
+            ingresarFicha(tablero,columna-1,jugador);
+            if(juegoTerminado(tablero,columna-1,jugador)) 
+            {
+                bandera=false;
+                cout<<"Ganó el jugador "<<jugador<<endl;
+            }
+            if(jugador==1)jugador++;
+            else if(jugador==2)jugador--;
         }
     } while (bandera);
     cout<<"El juego termino:"<<endl;
     rellenar(tablero);
 }
 
-void ingresarFicha(string tablero[6][7],int columna)
+void ingresarFicha(string tablero[6][7],int columna,int jugador)
 {
     for (int i = 6; i >= 0; i--)
     {
-        if(tablero[i][columna]==" * ")
+        if(tablero[i][columna]==" * " && jugador==1)
         {
             tablero[i][columna]=" X ";
+            return;
+        }
+        if(tablero[i][columna]==" * " && jugador==2)
+        {
+            tablero[i][columna]=" O ";
             return;
         }
         if(i==0) cout<<"La columna esta llena "<<endl;
@@ -117,10 +130,19 @@ void ingresarFicha(string tablero[6][7],int columna)
     
 }
 
-bool juegoTerminado(string tablero[6][7],int columna)
+bool juegoTerminado(string tablero[6][7],int columna,int jugador)
 {
     int cant = 0;
     int fila=5;
+    string player=""; 
+    if(jugador==1)
+    {
+        player = " X ";
+    }
+    else
+    {
+        player= " O ";
+    }
     for (int i = 0; i < 5; i++)
     {
         if (tablero[i][columna]!=" * ")
@@ -136,18 +158,16 @@ bool juegoTerminado(string tablero[6][7],int columna)
     for (int i = columna; i >= 0; i--)
     {
 
-        if(tablero[fila][i]==" X ")
+        if(tablero[fila][i]==player)
         {
             inicioCol=i;
         }
         else if(tablero[fila][i]==" * ")break;
     }
-    cout<<"inicio de columna: "<<inicioCol<<endl;
     for (int i = 0; i < 4; i++)
     {
-        if(tablero[fila][inicioCol]==" X ")
+        if(tablero[fila][inicioCol]==player)
         {
-            cout<<cant<<endl;
             cant++;
             inicioCol++;
         }
@@ -161,7 +181,7 @@ bool juegoTerminado(string tablero[6][7],int columna)
     //Vertical
     for (int i = fila; i >0; i--)
     {
-        if(tablero[i][columna]==" X ")
+        if(tablero[i][columna]==player)
         {
             inicioFil=i;
         }
@@ -169,7 +189,7 @@ bool juegoTerminado(string tablero[6][7],int columna)
     }
     for (int i = 0; i < 4; i++)
     {
-        if(tablero[inicioFil][columna]==" X ")
+        if(tablero[inicioFil][columna]==player)
         {
             cant++;
             inicioFil++;
@@ -184,19 +204,51 @@ bool juegoTerminado(string tablero[6][7],int columna)
 
     for (int i = columna; i >= 0; i--)
     {
-        if(tablero[inicioFil+1][inicioCol-1]==" X ")
+        if(tablero[inicioFil+1][inicioCol-1]==player)
         {
-            inicioFil+=1;
-            inicioCol-=1; 
+            inicioFil++;
+            inicioCol--; 
         }
-        else if(tablero[inicioFil][inicioCol]==" * " || inicioFil!= -1)break;
-    }
-    cout<<"Inicio de fila "<<inicioFil<<" Inicio de columna "<<inicioCol<<endl;
-    for (int i = columna; i >= 0; i--)
-    {
-        if(tablero[inicioFil])
+        else if(tablero[inicioFil][inicioCol]==player || inicioFil!= -1)break;
     }
 
+    for (int i = 0; i < 4; i++)
+    {
+        if(tablero[inicioFil][inicioCol]==player)
+        {
+            cant++;
+            inicioFil--;
+            inicioCol++;
+        }
+    }
+    if(cant==4) return true;
+
+
+    //Diagonal "\"
+    cant=0;
+    inicioFil=fila;
+    inicioCol=columna;
+
+    for (int i = columna; i >= 0; i--)
+    {
+        if(tablero[inicioFil][inicioCol]==" * " || inicioCol == 0)break;
+        else if(tablero[inicioFil-1][inicioCol-1]==" X ")
+        {
+            inicioFil--;
+            inicioCol--; 
+
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if(tablero[inicioFil][inicioCol]==" X ")
+        {
+            cant++;
+            inicioFil++;
+            inicioCol++;
+        }
+    }
+    if(cant==4) return true;
 
     if(columna == 6)return true;
     
