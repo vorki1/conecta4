@@ -184,17 +184,18 @@ bool juegoTerminado(string tablero[6][7],int columna)
 
     for (int i = columna; i >= 0; i--)
     {
-        if(tablero[inicioFil][inicioCol]==" X ")
+        if(tablero[inicioFil+1][inicioCol-1]==" X ")
         {
-            cout<<inicioCol<<" "<<inicioFil<<endl;
             inicioFil+=1;
-            inicioCol-=1;
-            
+            inicioCol-=1; 
         }
-        else if(tablero[inicioFil][inicioCol]==" * ")break;
+        else if(tablero[inicioFil][inicioCol]==" * " || inicioFil!= -1)break;
     }
-    cout<<"Inicio de fila "<<inicioFil<<" Inicio de columna "<<inicioFil<<endl;
-
+    cout<<"Inicio de fila "<<inicioFil<<" Inicio de columna "<<inicioCol<<endl;
+    for (int i = columna; i >= 0; i--)
+    {
+        if(tablero[inicioFil])
+    }
 
 
     if(columna == 6)return true;
