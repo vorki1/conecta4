@@ -1,13 +1,19 @@
 #include <iostream>
+#include <climits>
 using namespace std;
 
+const int PROFUNDIDAD_MAX = 5;
 void rellenar(string tablero[6][7]);
 void imprimirTablero(string tablero[6][7]);
 void comenzarJuego(string tablero[6][7]);
 void comenzarJuegoCPU(string,string tablero[6][7]);
 void ingresarFicha(string tablero[6][7],int,int);
 bool juegoTerminado(string tablero[6][7],int,int);
-bool evaluarTablero(string tablero[6][7], int);
+int evaluarMovimiento(string tablero[6][7], int columna, int jugador);
+int minimax(string tablero[6][7], int profundidad, bool esMaximizando);
+bool columnaValida(string tablero[6][7], int columna);
+int evaluarTablero(string tablero[6][7]);
+int evaluarLinea(string c1, string c2, string c3, string c4);
 
 int main()
 {
@@ -130,13 +136,9 @@ void comenzarJuegoCPU(string dificultad,string tablero[6][7])
                 break;
             }
             cout<<"Vamos bien"<<endl;
-            do
-            {
-                columna = rand()%7;
-            } while (tablero[0][columna] != " * ");
-
-            ingresarFicha(tablero,columna,2);
-            if(juegoTerminado(tablero,columna,2))
+            int mejorJugada = minimax(tablero,0,true);//llamo a la funcion minimax
+            ingresarFicha(tablero,mejorJugada,2);
+            if(juegoTerminado(tablero,mejorJugada,2))
             {
                 cout<<"El juego termino, ganó la CPU"<<endl;
                 break;
@@ -315,15 +317,116 @@ bool juegoTerminado(string tablero[6][7],int columna,int jugador)
 
 }
 
-bool evaluarTablero(string tablero[6][7],int columna)
-{
-    for (int i = 0; i < 7; i++)
-    {
-        if(tablero[i][columna]=="")
-        {
-            tablero[i][columna]="X";
-            return true;
+int minimax(string tablero[6][7], int profundidad, bool esMaximizando) {
+    // Definir la lógica del algoritmo minimax
+    // Evaluar los posibles movimientos y devolver el mejor movimiento
+
+    // Pseudocódigo básico del algoritmo minimax
+    if (profundidad == PROFUNDIDAD_MAX || juegoTerminado(tablero,1,2)) {
+        // Devolver el puntaje de la hoja del árbol de juego
+        return evaluarTablero(tablero);
+    }
+
+    if (esMaximizando) {
+        int mejorPuntaje = INT_MIN;
+        for (int columna = 0; columna < 7; columna++) {
+            // Verificar si la columna es válida para realizar un movimiento
+            if (columnaValida(tablero, columna)) {
+                // Realizar el movimiento
+                // ...
+                int puntaje = minimax(tablero, profundidad + 1, false);
+                // Deshacer el movimiento
+                // ...
+                mejorPuntaje = max(mejorPuntaje, puntaje);
+            }
         }
+        return mejorPuntaje;
+    } else {
+        int mejorPuntaje = INT_MAX;
+        for (int columna = 0; columna < 7; columna++) {
+            // Verificar si la columna es válida para realizar un movimiento
+            if (columnaValida(tablero, columna)) {
+                // Realizar el movimiento
+                // ...
+                int puntaje = minimax(tablero, profundidad + 1, true);
+                // Deshacer el movimiento
+                // ...
+                mejorPuntaje = min(mejorPuntaje, puntaje);
+            }
+        }
+        return mejorPuntaje;
+    }
+}
+bool columnaValida(string tablero[6][7], int columna)
+{
+    for (int i = 6; i >=0; i--)
+    {
+        if (tablero[i][columna]!=" * ")return true;
     }
     return false;
+    
+}
+int evaluarTablero(string tablero[6][7]) {
+    int puntaje = 0;
+
+    // Evaluar las filas
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            puntaje += evaluarLinea(tablero[i][j], tablero[i][j + 1], tablero[i][j + 2], tablero[i][j + 3]);
+        }
+    }
+
+    // Evaluar las columnas
+    for (int i = 0; i < 7; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            puntaje += evaluarLinea(tablero[j][i], tablero[j + 1][i], tablero[j + 2][i], tablero[j + 3][i]);
+        }
+    }
+
+    // Evaluar las diagonales "/"
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            puntaje += evaluarLinea(tablero[i][j], tablero[i + 1][j + 1], tablero[i + 2][j + 2], tablero[i + 3][j + 3]);
+        }
+    }
+
+    // Evaluar las diagonales "\"
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 3; j < 7; ++j) {
+            puntaje += evaluarLinea(tablero[i][j], tablero[i + 1][j - 1], tablero[i + 2][j - 2], tablero[i + 3][j - 3]);
+        }
+    }
+
+    return puntaje;
+}
+
+int evaluarLinea(string c1, string c2, string c3, string c4) {
+    int puntaje = 0;
+
+    // Contar las fichas del jugador en la línea
+    int fichasJugador = 0;
+    int fichasOponente = 0;
+
+    if (c1 == " X ") fichasJugador++;
+    else if (c1 == " O ") fichasOponente++;
+
+    if (c2 == " X ") fichasJugador++;
+    else if (c2 == " O ") fichasOponente++;
+
+    if (c3 == " X ") fichasJugador++;
+    else if (c3 == " O ") fichasOponente++;
+
+    if (c4 == " X ") fichasJugador++;
+    else if (c4 == " O ") fichasOponente++;
+
+    // Asignar puntajes según la cantidad de fichas en la línea
+    if (fichasJugador == 4) puntaje += 100; // Ganador
+    else if (fichasJugador == 3 && fichasOponente == 0) puntaje += 5; // Tres fichas del jugador
+    else if (fichasJugador == 2 && fichasOponente == 0) puntaje += 2; // Dos fichas del jugador
+
+    if (fichasOponente == 4) puntaje -= 100; // Oponente gana
+    else if (fichasOponente == 3 && fichasJugador == 0) puntaje -= 5; // Tres fichas del oponente
+    else if (fichasOponente == 2 && fichasJugador == 0) puntaje -= 2; // Dos fichas del oponente
+
+    return puntaje;
 }
