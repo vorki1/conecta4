@@ -137,8 +137,16 @@ void comenzarJuegoCPU(string dificultad,string tablero[6][7])
                 cout<<"El juego termino, le ganaste a la CPU"<<endl;
                 break;
             }
-            int mejorJugada = minimax(tablero,0,true);//llamo a la funcion minimax
+            int mejorJugada=minimax(tablero,0,true);
+            /*do
+            {
+                mejorJugada = minimax(tablero,0,true);//llamo a la funcion minimax
+            } while (mejorJugada<0 || mejorJugada>6);*/
+            
+            
+            
             cout<<"FuncionaMinimax"<<endl;
+            cout<<mejorJugada<<endl;
             ingresarFicha(tablero,mejorJugada,2);
             if(juegoTerminado(tablero,mejorJugada,2))
             {
@@ -309,7 +317,6 @@ bool juegoTerminado(string tablero[6][7],int columna,int jugador)
             inicioCol++;
         }
     }
-    cout<<fila<<endl;
     if(cant==4)
     {
     cout<<"Gano en la diagonal que parte de: "<<inicioFil<<" "<<inicioCol<<endl;
@@ -320,7 +327,7 @@ bool juegoTerminado(string tablero[6][7],int columna,int jugador)
 }
 
 int minimax(string tablero[6][7], int profundidad, bool esMaximizando) {
-    if (profundidad == 0 || juegoTerminado(tablero, 0, 0)) {
+    if (profundidad == 0 || juegoTerminado(tablero, 0, 2)) {
         return evaluarTablero(tablero);
     }
 
@@ -330,7 +337,7 @@ int minimax(string tablero[6][7], int profundidad, bool esMaximizando) {
         int puntaje = 0;
         for (int columna = 0; columna < 7; ++columna) {
             if (columnaValida(tablero, columna)) {
-                if(realizarJugada(tablero, columna, 1))
+                if(realizarJugada(tablero, columna, 2))
                 {
                     puntaje = minimax(tablero, profundidad - 1, true);
                     deshacerJugada(tablero, columna);
@@ -361,7 +368,8 @@ int minimax(string tablero[6][7], int profundidad, bool esMaximizando) {
                 }
             }
         }
-
+        if(mejorColumna <0 || mejorColumna>7)mejorColumna= minimax(tablero,profundidad-1,true);
+        cout<<"Valor de la mejor jugada: "<<mejorColumna<<endl;
         return mejorColumna;
     }
 }
