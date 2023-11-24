@@ -14,6 +14,8 @@ int minimax(string tablero[6][7], int profundidad, bool esMaximizando);
 bool columnaValida(string tablero[6][7], int columna);
 int evaluarTablero(string tablero[6][7]);
 int evaluarLinea(string c1, string c2, string c3, string c4);
+bool realizarJugada(string tablero[6][7],int columna,int jugador);
+void deshacerJugada(string tablero[6][7],int columna);
 
 int main()
 {
@@ -135,8 +137,8 @@ void comenzarJuegoCPU(string dificultad,string tablero[6][7])
                 cout<<"El juego termino, le ganaste a la CPU"<<endl;
                 break;
             }
-            cout<<"Vamos bien"<<endl;
             int mejorJugada = minimax(tablero,0,true);//llamo a la funcion minimax
+            cout<<"FuncionaMinimax"<<endl;
             ingresarFicha(tablero,mejorJugada,2);
             if(juegoTerminado(tablero,mejorJugada,2))
             {
@@ -318,43 +320,49 @@ bool juegoTerminado(string tablero[6][7],int columna,int jugador)
 }
 
 int minimax(string tablero[6][7], int profundidad, bool esMaximizando) {
-    // Definir la lógica del algoritmo minimax
-    // Evaluar los posibles movimientos y devolver el mejor movimiento
-
-    // Pseudocódigo básico del algoritmo minimax
-    if (profundidad == PROFUNDIDAD_MAX || juegoTerminado(tablero,1,2)) {
-        // Devolver el puntaje de la hoja del árbol de juego
+    if (profundidad == 0 || juegoTerminado(tablero, 0, 0)) {
         return evaluarTablero(tablero);
     }
 
     if (esMaximizando) {
         int mejorPuntaje = INT_MIN;
-        for (int columna = 0; columna < 7; columna++) {
-            // Verificar si la columna es válida para realizar un movimiento
+        int mejorColumna = -1;
+        int puntaje = 0;
+        for (int columna = 0; columna < 7; ++columna) {
             if (columnaValida(tablero, columna)) {
-                // Realizar el movimiento
-                // ...
-                int puntaje = minimax(tablero, profundidad + 1, false);
-                // Deshacer el movimiento
-                // ...
-                mejorPuntaje = max(mejorPuntaje, puntaje);
+                if(realizarJugada(tablero, columna, 1))
+                {
+                    puntaje = minimax(tablero, profundidad - 1, true);
+                    deshacerJugada(tablero, columna);
+                }
+
+                if (puntaje > mejorPuntaje) {
+                    mejorPuntaje = puntaje;
+                    mejorColumna = columna;
+                }
             }
         }
-        return mejorPuntaje;
+
+        return mejorColumna;
     } else {
         int mejorPuntaje = INT_MAX;
-        for (int columna = 0; columna < 7; columna++) {
-            // Verificar si la columna es válida para realizar un movimiento
+        int mejorColumna = -1;
+        int puntaje = 0;
+        for (int columna = 0; columna < 7; ++columna) {
             if (columnaValida(tablero, columna)) {
-                // Realizar el movimiento
-                // ...
-                int puntaje = minimax(tablero, profundidad + 1, true);
-                // Deshacer el movimiento
-                // ...
-                mejorPuntaje = min(mejorPuntaje, puntaje);
+                if(realizarJugada(tablero, columna, 1))
+                {
+                    puntaje = minimax(tablero, profundidad - 1, true);
+                    deshacerJugada(tablero, columna);
+                }
+                if (puntaje < mejorPuntaje) {
+                    mejorPuntaje = puntaje;
+                    mejorColumna = columna;
+                }
             }
         }
-        return mejorPuntaje;
+
+        return mejorColumna;
     }
 }
 bool columnaValida(string tablero[6][7], int columna)
@@ -429,4 +437,29 @@ int evaluarLinea(string c1, string c2, string c3, string c4) {
     else if (fichasOponente == 2 && fichasJugador == 0) puntaje -= 2; // Dos fichas del oponente
 
     return puntaje;
+}
+
+bool realizarJugada(string tablero[6][7],int columna,int jugador)
+{
+    for (int i = 6; i >= 0; i--)
+    {
+        if(tablero[i][columna]==" * " && jugador==2)
+        {
+            tablero[i][columna]=" O ";
+            return true;
+        }
+        if(i==0)return false;
+    }
+}
+void deshacerJugada(string tablero[6][7],int columna)
+{
+    for (int i = 6; i >= 0; i--)
+    {
+        if(tablero[i][columna]==" O ")
+        {
+            tablero[i][columna]=" * ";
+            return;
+        }
+        if(i==0)return;
+    }
 }
