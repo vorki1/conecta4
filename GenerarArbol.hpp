@@ -4,57 +4,62 @@
 #include "NodoArbol.h"
 using namespace std;
 
-const int fil = 6;
-const int col = 7;
 
-void crearProfundidades(NodoArbol*);
-void ingresarFicha(NodoArbol*,int);
+void crearProfundidades(NodoArbol*,int profundidad,int jugador);
+void ingresarFicha(NodoArbol*,int**,int,int);
 class GenerarArbol
 {
 private:
     NodoArbol* raiz;
     int profundidad;
+    int jugador=1;
 public:
     GenerarArbol(NodoArbol* raiz,int profundidad)
     {
         this->raiz=raiz;
         this->profundidad=profundidad;
-        crearProfundidades(raiz);
+        crearProfundidades(raiz,profundidad,1);
     }
     void crearRamas();
     ~GenerarArbol();
 };
 
 
-void crearProfundidades(NodoArbol* raiz)
+void crearProfundidades(NodoArbol* raiz,int profundidad,int jugador)
 {
-    NodoArbol* hijo;
-    for (int i = 0; i < 7; i++)
+    if (profundidad==0)return;//Caso base
+
+    jugador++;
+    if(jugador!=2)jugador=1;
+    raiz->generarHijos(raiz->getTablero());//Se generan los 7 hijos de la raiz
+    for (int i = 0; i < raiz->getHijos().size(); i++)
     {
-        raiz->getHijos().push_back(hijo);
+        ingresarFicha(raiz->getHijos()[i],raiz->getTablero(),i,jugador);
     }
-    for (int i = 0; i < 7; i++)
+    
+    for (int i = 0; i < raiz->getHijos().size(); i++)
     {
-        ingresarFicha(raiz->getHijos()[0],i);
+        crearProfundidades(raiz->getHijos()[i],profundidad-1,jugador);
     }
     
 }
 
-void ingresarFicha(NodoArbol* raiz,int columna)
+void ingresarFicha(NodoArbol* raiz,int** tablero,int columna,int jugador)
 {
-    for (int i = 6; i >= 0; i--)
+    for (int i  =5; i >= 0; i--)
     {
-        if(*(*(raiz->getTablero()+i)+columna)==0)
+        if(*(*(tablero+i)+columna)==0 && jugador==1)
         {
-            *(*(raiz->getTablero()+i)+columna)=1;
+            *(*(tablero+i)+columna)=1;
+            raiz->setTablero(tablero);
             return;
         }
-        else if(*(*(raiz->getTablero()+i)+columna)==0)
+        else if(*(*(tablero+i)+columna)==0 && jugador==2)
         {
-            *(*(raiz->getTablero()+i)+columna)=2;
+            *(*(tablero+i)+columna)=2;
+            raiz->setTablero(tablero);
             return;
         }
-        
     }
 }
 

@@ -13,13 +13,6 @@ public:
     NodoArbol(int**tablero)
     {   
         this->tablero=tablero;
-        /*
-        tablero = new int*[6];
-        for (int i = 0; i < 6; i++)
-        {
-            tablero[i]= new int[7];
-        }*/
-        //Para poner elementos en una matriz: cin>>*(*(tablero+i)+j)
     }
     int getPuntaje()
     {
@@ -31,11 +24,32 @@ public:
     }
     int** getTablero()
     {
-        return tablero;
+        int** aux = new int*[6];
+    
+        for (int i = 0; i < 6; ++i) {
+            aux[i] = new int[7];
+            for (int j = 0; j < 7; ++j) {
+                *(*(aux+i)+j) = *(*(tablero+i)+j);
+            }
+    }
+        return aux;
+    }
+    void setTablero(int** tablero)
+    {
+        this->tablero=tablero;
     }
     vector<NodoArbol*> getHijos()
     {
         return hijos;
+    }
+    void generarHijos(int** tablero)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            NodoArbol* hijo = new NodoArbol(tablero);
+            hijos.push_back(hijo);
+        }
+        
     }
     ~NodoArbol();
 };
