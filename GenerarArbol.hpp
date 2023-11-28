@@ -35,7 +35,7 @@ void crearProfundidades(NodoArbol* raiz)
     }
     for (int i = 0; i < 7; i++)
     {
-        raiz->getHijos()[0];
+        ingresarFicha(raiz->getHijos()[0],i);
     }
     
 }
