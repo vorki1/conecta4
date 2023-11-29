@@ -20,7 +20,11 @@ public:
         this->profundidad=profundidad;
         crearProfundidades(raiz,profundidad,1);
     }
-    void crearRamas();
+    void setearProfundidades(int** tablero,int prof)
+    {
+        raiz->setTablero(tablero);
+        crearProfundidades(raiz,prof,1);
+    }
     ~GenerarArbol();
 };
 
