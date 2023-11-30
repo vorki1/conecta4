@@ -32,6 +32,7 @@ int** crearTablero()
     }
     return m;
 }
+int evaluarLinea(int s1, int s2, int s3, int s4);
 
 class Sistema
 {
@@ -41,7 +42,6 @@ private:
 
     int minimax(NodoArbol* nodo, int profundidad, bool esMaximizando);
     int evaluarTablero();
-
     void ingresarFichaCPU();
 
 public:
@@ -72,9 +72,7 @@ bool Sistema::ingresarFicha(int columna)
             return false;
     }
     ingresarFichaCPU();
-    cout<<"Hola"<<endl;
     imprimirTablero(tablero);
-    cout<<"Como estas"<<endl;
     return true;
 }
 
@@ -109,82 +107,69 @@ int Sistema::minimax(NodoArbol* nodo, int profundidad, bool esMaximizando)
 
 int Sistema::evaluarTablero()
 {
-    // Evaluar horizontalmente
-    for (int fila = 0; fila < 6; fila++)
-    {
-        for (int columna = 0; columna < 5; columna++)
-        {
-            int suma = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (*(*(tablero + fila) + columna + i) == 1) suma++;
-                else if (*(*(tablero + fila) + columna + i) == 2) suma--;
-            }
-            if (suma == 3)
-                return 100; // Ganó el jugador 1
-            else if (suma == -3)
-                return -100; // Ganó el jugador 2
+    int puntaje = 0;
+
+    // Evaluar las filas
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            puntaje += evaluarLinea(*(*(tablero + i) + j), *(*(tablero + i) + j+1), *(*(tablero + i) + j+2), *(*(tablero + i) + j+3));
         }
     }
 
-    // Evaluar verticalmente
-    for (int columna = 0; columna < 7; columna++)
-    {
-        for (int fila = 0; fila < 4; fila++)
-        {
-            int suma = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (*(*(tablero + fila + i) + columna) == 1) suma++;
-                else if (*(*(tablero + fila + i) + columna) == 2) suma--;
-            }
-            if (suma == 3)
-                return 100; // Ganó el jugador 1
-            else if (suma == -3)
-                return -100; // Ganó el jugador 2
+    // Evaluar las columnas
+    for (int i = 0; i < 7; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            puntaje += evaluarLinea(*(*(tablero + j) + i), *(*(tablero + j + 1) + i), *(*(tablero + j + 2) + i), *(*(tablero + j + 3) + i));
         }
     }
 
-    // Evaluar diagonalmente (hacia abajo a la derecha)
-    for (int fila = 0; fila < 4; fila++)
-    {
-        for (int columna = 0; columna < 5; columna++)
-        {
-            int suma = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (*(*(tablero + fila + i) + columna + i) == 1) suma++;
-                else if (*(*(tablero + fila + i) + columna + i) == 2) suma--;
-            }
-            if (suma == 3)
-                return 100; // Ganó el jugador 1
-            else if (suma == -3)
-                return -100; // Ganó el jugador 2
+    // Evaluar las diagonales "/"
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            puntaje += evaluarLinea(*(*(tablero + i) + j), *(*(tablero + i + 1) + j + 1), *(*(tablero + i + 2) + j + 2), *(*(tablero + i + 3) + j + 3));
         }
     }
 
-    // Evaluar diagonalmente (hacia arriba a la derecha)
-    for (int fila = 2; fila < 6; fila++)
-    {
-        for (int columna = 0; columna < 5; columna++)
-        {
-            int suma = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (*(*(tablero + fila - i) + columna + i) == 1) suma++;
-                else if (*(*(tablero + fila - i) + columna + i) == 2) suma--;
-            }
-            if (suma == 3)
-                return 100; // Ganó el jugador 1
-            else if (suma == -3)
-                return -100; // Ganó el jugador 2
+    // Evaluar las diagonales "\"
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 3; j < 7; ++j) {
+            puntaje += evaluarLinea(*(*(tablero + i) + j), *(*(tablero + i + 1) + j - 1), *(*(tablero + i + 2) + j - 2), *(*(tablero + i + 3) + j - 3));
         }
     }
 
-    // Si no hay ganador, devuelve 0
-    return 1;
+    return puntaje;
 }
 
+int evaluarLinea(int s1, int s2, int s3, int s4) {
+    int puntaje = 0;
+
+    // Contar las fichas del jugador en la línea
+    int fichasJugador = 0;
+    int fichasOponente = 0;
+
+    if (s1 == 1) fichasJugador++;
+    else if (s1 == 2) fichasOponente++;
+
+    if (s2 == 1) fichasJugador++;
+    else if (s2 == 2) fichasOponente++;
+
+    if (s3 == 1) fichasJugador++;
+    else if (s3 == 2) fichasOponente++;
+
+    if (s4 == 1) fichasJugador++;
+    else if (s4 == 2) fichasOponente++;
+
+    // Asignar puntajes según la cantidad de fichas en la línea
+    if (fichasJugador == 4) puntaje += 100; // Ganador
+    else if (fichasJugador == 3 && fichasOponente == 0) puntaje += 5; // Tres fichas del jugador
+    else if (fichasJugador == 2 && fichasOponente == 0) puntaje += 2; // Dos fichas del jugador
+
+    if (fichasOponente == 4) puntaje -= 100; // Oponente gana
+    else if (fichasOponente == 3 && fichasJugador == 0) puntaje -= 5; // Tres fichas del oponente
+    else if (fichasOponente == 2 && fichasJugador == 0) puntaje -= 2; // Dos fichas del oponente
+
+    return puntaje;
+}
 
 
 void Sistema::ingresarFichaCPU()
@@ -192,16 +177,28 @@ void Sistema::ingresarFichaCPU()
     int mejorJugada = -1;
     int mejorValor = INT_MIN;
 
-    for (NodoArbol* hijo : base->getRaiz()->getHijos())
+    for (int columna = 0; columna < 7; ++columna)
     {
-        int valor = minimax(hijo, 5, false); // Ajusta la profundidad según tus necesidades
-        cout << "Valor de la jugada " << hijo->getMovimiento() << ": " << valor << endl;
-        cout<<mejorJugada<<endl;
-        if (valor >= mejorValor)//Aqui esta en el error, en el >=, la variable valor nunca cambia de valor, porque falta evaluar mejor el tablero.
+        int fila = 5;  // Comenzar desde la parte inferior de la columna
+
+        while (fila >= 0 && *(*(tablero + fila) + columna) != 0)
         {
-            mejorValor = valor;
-            mejorJugada = hijo->getMovimiento();
-            cout<<mejorJugada<<endl;
+            --fila;
+        }
+
+        if (fila >= 0)
+        {
+            *(*(tablero + fila) + columna) = 2;  // Colocar la ficha en la posición válida
+            int valor = minimax(base->getRaiz(), 5, false);  // Evaluar el tablero después de colocar la ficha
+            cout << "Valor de la jugada " << columna << ": " << valor << endl;
+
+            if (valor > mejorValor)
+            {
+                mejorValor = valor;
+                mejorJugada = columna;
+            }
+
+            *(*(tablero + fila) + columna) = 0;  // Deshacer la jugada para probar con la siguiente columna
         }
     }
 
@@ -218,4 +215,8 @@ void Sistema::ingresarFichaCPU()
 }
 
 
-// Resto de la implementación de la clase Sistema...
+bool::Sistema::validarJugada()
+{
+
+}
+
