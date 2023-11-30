@@ -39,10 +39,11 @@ class Sistema
 private:
     GenerarArbol* base;
     int** tablero;
+    int columnaCPU;
 
     int minimax(NodoArbol* nodo, int profundidad, bool esMaximizando);
     int evaluarTablero();
-    void ingresarFichaCPU();
+    int ingresarFichaCPU();
 
 public:
     Sistema(GenerarArbol* base)
@@ -52,7 +53,7 @@ public:
     }
 
     bool ingresarFicha(int columna);
-    bool validarJugada();
+    bool validarJugada(int,int);
     void guardarPartida();
     void cargarPartida();
     void puntuaciones();
@@ -71,7 +72,7 @@ bool Sistema::ingresarFicha(int columna)
         if (i == 0)
             return false;
     }
-    ingresarFichaCPU();
+    columnaCPU = ingresarFichaCPU();
     imprimirTablero(tablero);
     return true;
 }
@@ -172,7 +173,7 @@ int evaluarLinea(int s1, int s2, int s3, int s4) {
 }
 
 
-void Sistema::ingresarFichaCPU()
+int Sistema::ingresarFichaCPU()
 {
     int mejorJugada = -1;
     int mejorValor = INT_MIN;
@@ -209,14 +210,137 @@ void Sistema::ingresarFichaCPU()
         if (*(*(tablero + i) + mejorJugada) == 0)
         {
             *(*(tablero + i) + mejorJugada) = 2;
-            return;
+            return mejorJugada;
         }
     }
 }
 
 
-bool::Sistema::validarJugada()
+bool::Sistema::validarJugada(int columna,int jugador)
 {
+    int cant = 0;
+    int fila=5;
+    
+    
+    for (int i = 0; i < 5; i++)
+    {
+        if (*(*(tablero + i) + columna)!=0)
+        {
+            fila=i;
+            break;
+        }
+    }
+    int inicioCol= columna;
+    //Horizontal
+    for (int i = columna; i >= 0; i--)
+    {
 
+        if(*(*(tablero + fila) + i)==jugador)
+        {
+            inicioCol=i;
+        }
+        else if(*(*(tablero + fila) + i)==0)break;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if(*(*(tablero + fila) + inicioCol)==jugador)
+        {
+            cant++;
+            inicioCol++;
+        }
+    }
+    if(cant==4)
+    {
+    cout<<"Gano en la horizontal de: "<<fila<<endl;
+    return true;
+    }
+
+
+    cant=0;
+    int inicioFil = fila;
+    //Vertical
+    for (int i = fila; i >0; i--)
+    {
+        if(*(*(tablero + i) + columna)==jugador)
+        {
+            inicioFil=i;
+        }
+        else if(*(*(tablero + i) + columna)==0)break;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if(*(*(tablero + inicioFil) + columna)==jugador)
+        {
+            cant++;
+            inicioFil++;
+        }
+    }
+    if(cant==4)
+    {
+    cout<<"Gano en la vertical de: "<<columna<<endl;
+    return true;
+    }
+
+    //Diagonal "/"
+    cant=0;
+    inicioFil=fila;
+    inicioCol=columna;
+
+    for (int i = columna; i >= 0; i--)
+    {
+        if(tablero[inicioFil+1][inicioCol-1]==jugador && inicioFil!=0)
+        {
+            inicioFil++;
+            inicioCol--; 
+        }
+        else if(tablero[inicioFil][inicioCol]==jugador || inicioFil!= -1)break;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        if(tablero[inicioFil][inicioCol]==jugador)
+        {
+            cant++;
+            inicioFil--;
+            inicioCol++;
+        }
+    }
+    if(cant==4) 
+    {
+    cout<<"Gano en la diagonal que parte de: "<<inicioFil<<" "<<inicioCol<<endl;
+    return true;
+    }
+
+
+    //Diagonal "\"
+    cant=0;
+    inicioFil=fila;
+    inicioCol=columna;
+
+    for (int i = columna; i >= 0; i--)
+    {
+        if(fila==0)break;
+        else if(*(*(tablero + inicioFil-1) + inicioCol-1)==0)break;
+        else if(*(*(tablero + inicioFil-1) + inicioCol-1)==1)
+        {
+            inicioFil--;
+            inicioCol--; 
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if(*(*(tablero + inicioFil) + inicioCol)==1)
+        {
+            cant++;
+            inicioFil++;
+            inicioCol++;
+        }
+    }
+    if(cant==4)
+    {
+    cout<<"Gano en la diagonal que parte de: "<<inicioFil<<" "<<inicioCol<<endl;
+    return true;
+    }
+    return false;
 }
 
