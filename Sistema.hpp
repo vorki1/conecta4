@@ -53,6 +53,7 @@ public:
     }
 
     bool ingresarFicha(int columna);
+    bool fichaCPU();
     bool validarJugada(int,int);
     void guardarPartida();
     void cargarPartida();
@@ -69,12 +70,16 @@ bool Sistema::ingresarFicha(int columna)
             *(*(tablero + i) + columna) = 1;
             break;
         }
-        if (i == 0)
-            return false;
+        if (i == 0) return false;
     }
-    columnaCPU = ingresarFichaCPU();
     imprimirTablero(tablero);
     return true;
+}
+bool Sistema::fichaCPU()
+{
+    columnaCPU = ingresarFichaCPU();
+    imprimirTablero(tablero);
+    return validarJugada(columnaCPU,2);
 }
 
 int Sistema::minimax(NodoArbol* nodo, int profundidad, bool esMaximizando)
@@ -213,6 +218,7 @@ int Sistema::ingresarFichaCPU()
             return mejorJugada;
         }
     }
+    return 0;
 }
 
 

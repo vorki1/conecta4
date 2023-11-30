@@ -68,10 +68,21 @@ void comenzarJuego(Sistema* sistema)
         if(columna < 0 || columna > 6)cout<<"La columna ingresada es invalida."<<endl;
         else
         {
-            if(!sistema->ingresarFicha(columna))
+            if(!sistema->ingresarFicha(columna))cout<<"La columna esta llena!!"<<endl;
+            else
             {
-                cout<<"La columna esta llena!!"<<endl;
+                if(sistema->validarJugada(columna,1))
+                {
+                    cout<<"Has ganado!!"<<endl;
+                    break;
+                }
+                if(sistema->fichaCPU())
+                {
+                    cout<<"La CPU ha ganado!!"<<endl;
+                    break;
+                }
             }
+            
             if(columna==5)bandera = false;
         }
     } while (bandera);
