@@ -4,25 +4,14 @@ using namespace std;
 
 
 int** crearTablero();
-void comenzarJuego(GenerarArbol*);
+void comenzarJuego(Sistema*);
 
 int main()
 {
     int** tablero = crearTablero();
     NodoArbol* raiz = new NodoArbol(tablero);
     GenerarArbol* arbolPosibilidades = new GenerarArbol(raiz,5);
-    
-
-    //Este for sirve para comprobar el funcionamiento de la generacion del arbol de posibilidades
-    /*for (int i = 0; i < 6; i++)
-    {
-        for (int j = 0; j < 7; j++)
-        {
-            
-            cout<<*(*(raiz->getHijos()[0]->getHijos()[6]->getHijos()[0]->getHijos()[0]->getTablero() +i)+j);
-        }
-        cout<<endl;
-    }*/
+    Sistema* sistema = new Sistema(arbolPosibilidades);
 
     int opcion;
     do
@@ -40,7 +29,7 @@ int main()
         switch (opcion)
         {
         case 1:
-            comenzarJuego(arbolPosibilidades);
+            comenzarJuego(sistema);
             break;
         case 2:
             cout<<"Opcion 2"<<endl;
@@ -69,26 +58,21 @@ int main()
     return 0;
 }
 
-int** crearTablero()
+void comenzarJuego(Sistema* sistema)
 {
-    int** m = new int*[6];
-    for (int i = 0; i < 6; i++)
+    int columna;
+    bool bandera = true;
+    do
     {
-        m[i] = new int[7];
-    }
-    for (int i = 0; i < 6; i++)
-    {
-        for (int j = 0; j < 7; j++)
+        cout<<"numero del 0 al 6: "<<endl;cin>>columna;
+        if(columna < 0 || columna > 6)cout<<"La columna ingresada es invalida."<<endl;
+        else
         {
-            
-            *(*(m+i)+j) = 0;
+            if(!sistema->ingresarFicha(columna))
+            {
+                cout<<"La columna esta llena!!"<<endl;
+            }
+            if(columna==5)bandera = false;
         }
-    }
-    
-    return m;
-}
-
-void comenzarJuego(GenerarArbol* ramaPosibilidades)
-{
-
+    } while (bandera);
 }

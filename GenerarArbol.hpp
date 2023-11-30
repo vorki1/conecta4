@@ -25,6 +25,10 @@ public:
         raiz->setTablero(tablero);
         crearProfundidades(raiz,prof,1);
     }
+    NodoArbol* getRaiz()
+    {
+        return raiz;
+    }
     ~GenerarArbol();
 };
 
@@ -39,6 +43,7 @@ void crearProfundidades(NodoArbol* raiz,int profundidad,int jugador)
     for (int i = 0; i < raiz->getHijos().size(); i++)
     {
         ingresarFicha(raiz->getHijos()[i],raiz->getTablero(),i,jugador);
+        raiz->getHijos()[i]->setMovimiento(i);
     }
     
     for (int i = 0; i < raiz->getHijos().size(); i++)
