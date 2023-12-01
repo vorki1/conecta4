@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <climits>
+#include <fstream>
 #include "GenerarArbol.hpp"
 
 using namespace std;
@@ -11,7 +12,10 @@ void imprimirTablero(int** m)
     {
         for (int j = 0; j < 7; j++)
         {
-            cout<<*(*(m + i) + j);
+            if(*(*(m + i) + j)==1)cout<<"|X|";
+            else if(*(*(m + i) + j)==2) cout<<"|O|";
+            else cout<<"|_|";
+            
         }
         cout<<endl;
     }
@@ -33,6 +37,7 @@ int** crearTablero()
     return m;
 }
 int evaluarLinea(int s1, int s2, int s3, int s4);
+void escribirMatrizEnArchivo(const char* nombreArchivo,int**);
 
 class Sistema
 {
@@ -41,7 +46,7 @@ private:
     int** tablero;
     int columnaCPU;
 
-    int minimax(NodoArbol* nodo, int profundidad, bool esMaximizando);
+    int minimax(NodoArbol* nodo, int profundidad, int alfa, int beta, bool esMaximizando);
     int evaluarTablero();
     int ingresarFichaCPU();
 
@@ -51,10 +56,14 @@ public:
         this->base = base;
         this->tablero = crearTablero();
     }
-
-    bool ingresarFicha(int columna);
-    bool fichaCPU();
-    bool validarJugada(int,int);
+    void setTablero()
+    {
+        this->tablero = crearTablero();
+    }
+    bool ingresarFicha(int columna);//Listo
+    bool fichaCPU(string dificultad);//Listo
+    void fichaRandomCPU(int);
+    bool validarJugada(int,int);//Listo
     void guardarPartida();
     void cargarPartida();
     void puntuaciones();
@@ -75,14 +84,51 @@ bool Sistema::ingresarFicha(int columna)
     imprimirTablero(tablero);
     return true;
 }
-bool Sistema::fichaCPU()
+bool Sistema::fichaCPU(string dificultad)
 {
-    columnaCPU = ingresarFichaCPU();
-    imprimirTablero(tablero);
-    return validarJugada(columnaCPU,2);
+    if(dificultad=="F")
+    {
+        int columna = rand() % 7;
+        fichaRandomCPU(columna);
+        cout<<"Movimiento de la computadora: "<<endl;
+        imprimirTablero(tablero);
+        return validarJugada(columna,2);
+    }
+    else if(dificultad=="M")
+    {
+        if (rand() % 100 < 20) 
+        {  // Aproximadamente un 20% de las veces toma una decisión aleatoria
+            int columna = rand() % 7;
+            fichaRandomCPU(columna);
+            cout<<"Movimiento de la computadora: "<<endl;
+            imprimirTablero(tablero);
+            return validarJugada(columna,2);
+        } 
+        else 
+        {
+            columnaCPU = ingresarFichaCPU();
+            cout<<"Movimiento de la computadora: "<<endl;
+            imprimirTablero(tablero);
+            return validarJugada(columnaCPU,2);
+        }
+
+    }
+    return false;
+}
+void Sistema::fichaRandomCPU(int columna)
+{
+    for (int i = 5; i >= 0; i--)
+    {
+        if (*(*(tablero + i) + columna) == 0)
+        {
+            *(*(tablero + i) + columna) = 2;
+            return;
+        }
+        if (i == 0) fichaRandomCPU(columna);
+    }
 }
 
-int Sistema::minimax(NodoArbol* nodo, int profundidad, bool esMaximizando)
+int Sistema::minimax(NodoArbol* nodo, int profundidad, int alfa, int beta, bool esMaximizando)
 {
     if (profundidad == 0 || nodo->esUnaHoja())
     {
@@ -94,8 +140,13 @@ int Sistema::minimax(NodoArbol* nodo, int profundidad, bool esMaximizando)
         int mejorValor = INT_MIN;
         for (NodoArbol* hijo : nodo->getHijos())
         {
-            int valor = minimax(hijo, profundidad - 1, false);
+            int valor = minimax(hijo, profundidad - 1, alfa, beta, false);
             mejorValor = max(mejorValor, valor);
+            alfa = max(alfa, mejorValor);
+
+            if (beta <= alfa)
+                break; // Poda alfa-beta
+
         }
         return mejorValor;
     }
@@ -104,12 +155,17 @@ int Sistema::minimax(NodoArbol* nodo, int profundidad, bool esMaximizando)
         int mejorValor = INT_MAX;
         for (NodoArbol* hijo : nodo->getHijos())
         {
-            int valor = minimax(hijo, profundidad - 1, true);
+            int valor = minimax(hijo, profundidad - 1, alfa, beta, true);
             mejorValor = min(mejorValor, valor);
+            beta = min(beta, mejorValor);
+
+            if (beta <= alfa)
+                break; // Poda alfa-beta
         }
         return mejorValor;
     }
 }
+
 
 int Sistema::evaluarTablero()
 {
@@ -177,7 +233,6 @@ int evaluarLinea(int s1, int s2, int s3, int s4) {
     return puntaje;
 }
 
-
 int Sistema::ingresarFichaCPU()
 {
     int mejorJugada = -1;
@@ -195,7 +250,7 @@ int Sistema::ingresarFichaCPU()
         if (fila >= 0)
         {
             *(*(tablero + fila) + columna) = 2;  // Colocar la ficha en la posición válida
-            int valor = minimax(base->getRaiz(), 5, false);  // Evaluar el tablero después de colocar la ficha
+            int valor = minimax(base->getRaiz(), 7, INT_MIN, INT_MAX, false);  // Evaluar el tablero después de colocar la ficha
             cout << "Valor de la jugada " << columna << ": " << valor << endl;
 
             if (valor > mejorValor)
@@ -217,17 +272,15 @@ int Sistema::ingresarFichaCPU()
             *(*(tablero + i) + mejorJugada) = 2;
             return mejorJugada;
         }
+        //if(i=0)return 0;
     }
     return 0;
 }
-
 
 bool::Sistema::validarJugada(int columna,int jugador)
 {
     int cant = 0;
     int fila=5;
-    
-    
     for (int i = 0; i < 5; i++)
     {
         if (*(*(tablero + i) + columna)!=0)
@@ -350,3 +403,64 @@ bool::Sistema::validarJugada(int columna,int jugador)
     return false;
 }
 
+void Sistema::guardarPartida()
+{
+    const char* nombreArchivo = "partida_guardada.txt";
+    escribirMatrizEnArchivo(nombreArchivo,tablero);
+}
+void escribirMatrizEnArchivo(const char* nombreArchivo,int** tablero)
+{
+    ofstream archivo(nombreArchivo);
+
+    if (archivo.is_open())
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                archivo << *(*(tablero + i) + j) << " ";
+            }
+            archivo << endl;
+        }
+
+        archivo.close();
+        cout << "Matriz guardada en el archivo " << nombreArchivo << endl;
+    }
+    else
+    {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para guardar la matriz." << endl;
+    }
+}
+void Sistema::cargarPartida()
+{
+    const char* nombreArchivo = "partida_guardada.txt";
+    ifstream archivo(nombreArchivo);
+
+    if (archivo.is_open())
+    {
+        // Limpiar el tablero actual
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                *(*(tablero + i) + j) = 0;
+            }
+        }
+
+        // Leer los valores desde el archivo y actualizar el tablero
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                archivo >> *(*(tablero + i) + j);
+            }
+        }
+
+        archivo.close();
+        cout << "Matriz cargada desde el archivo " << nombreArchivo << endl;
+    }
+    else
+    {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para cargar la matriz." << endl;
+    }
+}

@@ -4,13 +4,13 @@ using namespace std;
 
 
 int** crearTablero();
-void comenzarJuego(Sistema*);
+void comenzarJuego(Sistema*,string);
 
 int main()
 {
     int** tablero = crearTablero();
     NodoArbol* raiz = new NodoArbol(tablero);
-    GenerarArbol* arbolPosibilidades = new GenerarArbol(raiz,5);
+    GenerarArbol* arbolPosibilidades = new GenerarArbol(raiz,6);
     Sistema* sistema = new Sistema(arbolPosibilidades);
 
     int opcion;
@@ -23,16 +23,15 @@ int main()
         cout<<" "<<endl;
         cout<<"4) 2 jugadores"<<endl;
         cout<<"5) Puntuaciones"<<endl;
-        cout<<"6) Guardar partida"<<endl;
-        cout<<"7) Cargar partida"<<endl;
+        cout<<"6) Cargar partida"<<endl;
         cout<<"0) Salir"<<endl;cin>>opcion;
         switch (opcion)
         {
         case 1:
-            comenzarJuego(sistema);
+            comenzarJuego(sistema,"F");
             break;
         case 2:
-            cout<<"Opcion 2"<<endl;
+            comenzarJuego(sistema,"M");
             break;
         case 3:
             cout<<"Opcion 3"<<endl;
@@ -43,7 +42,9 @@ int main()
             cout<<"Opcion 5"<<endl;
             break;
         case 6:
-            cout<<"Opcion 6"<<endl;
+            sistema->cargarPartida();
+            cout<<"Partida cargada"<<endl;
+            comenzarJuego(sistema,"F");
             break;
         case 0:
             cout<<"Opcion 0"<<endl;
@@ -58,13 +59,19 @@ int main()
     return 0;
 }
 
-void comenzarJuego(Sistema* sistema)
+void comenzarJuego(Sistema* sistema,string dificultad)
 {
     int columna;
     bool bandera = true;
     do
     {
-        cout<<"numero del 0 al 6: "<<endl;cin>>columna;
+        cout<<"numero del 0 al 6: "<<endl;
+        cout<<"Ingrese el numero 9 para guardar la partida: "<<endl;cin>>columna;
+        if(columna==9)
+        {
+            sistema->guardarPartida();
+            break;
+        }
         if(columna < 0 || columna > 6)cout<<"La columna ingresada es invalida."<<endl;
         else
         {
@@ -76,7 +83,7 @@ void comenzarJuego(Sistema* sistema)
                     cout<<"Has ganado!!"<<endl;
                     break;
                 }
-                if(sistema->fichaCPU())
+                if(sistema->fichaCPU(dificultad))
                 {
                     cout<<"La CPU ha ganado!!"<<endl;
                     break;
@@ -86,4 +93,5 @@ void comenzarJuego(Sistema* sistema)
             if(columna==5)bandera = false;
         }
     } while (bandera);
+    sistema->setTablero();
 }
