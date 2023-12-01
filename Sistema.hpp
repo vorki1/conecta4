@@ -38,6 +38,7 @@ int** crearTablero()
 }
 int evaluarLinea(int s1, int s2, int s3, int s4);
 void escribirMatrizEnArchivo(const char* nombreArchivo,int**);
+void ingresarPuntuaciones(int ,int);
 
 class Sistema
 {
@@ -45,6 +46,8 @@ private:
     GenerarArbol* base;
     int** tablero;
     int columnaCPU;
+    int ganaJugador=0;
+    int ganaCPU=0;
 
     int minimax(NodoArbol* nodo, int profundidad, int alfa, int beta, bool esMaximizando);
     int evaluarTablero();
@@ -55,11 +58,26 @@ public:
     {
         this->base = base;
         this->tablero = crearTablero();
+        cargarPuntuaciones();
     }
     void setTablero()
     {
         this->tablero = crearTablero();
     }
+    void ganador(int jugador)
+    {
+        if(jugador==1)ganaJugador++;
+        else if(jugador==2)ganaCPU++;
+    }
+    int getVictoriasJugador()
+    {
+        return ganaJugador;
+    }
+    int getVictoriasCPU()
+    {
+        return ganaCPU;
+    }
+    void cargarPuntuaciones();
     bool ingresarFicha(int columna);//Listo
     bool fichaCPU(string dificultad);//Listo
     void fichaRandomCPU(int);
@@ -112,6 +130,13 @@ bool Sistema::fichaCPU(string dificultad)
             return validarJugada(columnaCPU,2);
         }
 
+    }
+    if(dificultad=="D")
+    {
+        columnaCPU = ingresarFichaCPU();
+        cout<<"Movimiento de la computadora: "<<endl;
+        imprimirTablero(tablero);
+        return validarJugada(columnaCPU,2);
     }
     return false;
 }
@@ -464,3 +489,40 @@ void Sistema::cargarPartida()
         cout << "No se pudo abrir el archivo " << nombreArchivo << " para cargar la matriz." << endl;
     }
 }
+void Sistema::puntuaciones()
+{
+
+    const char* nombreArchivo = "estadisticas.txt";
+    ofstream archivo(nombreArchivo);
+
+    if (archivo.is_open())
+    {
+        archivo << "Victorias del Jugador: " << getVictoriasJugador() << endl;
+        archivo << "Victorias de la CPU: " << getVictoriasCPU() << endl;
+
+        archivo.close();
+        cout << "Estadísticas guardadas en el archivo " << nombreArchivo << endl;
+    }
+    else
+    {
+        cout << "No se pudo abrir el archivo " << nombreArchivo << " para guardar las estadísticas." << endl;
+    }
+}
+void Sistema::cargarPuntuaciones() 
+{
+        const char* nombreArchivo = "estadisticas.txt";
+        ifstream archivo(nombreArchivo);
+
+        if (archivo.is_open()) {
+            archivo >> ganaJugador >> ganaCPU;
+            cout<<ganaJugador<<" Este puntaje tiene"<<endl;
+            cout<<ganaCPU<<" Este puntaje tiene"<<endl;
+            archivo.close();
+            cout << "Estadísticas cargadas desde el archivo " << nombreArchivo << endl;
+        } else {
+            // Si no se pudo abrir el archivo, asignamos 0 a ambas variables
+            ganaJugador = 0;
+            ganaCPU = 0;
+            cout << "No se pudo abrir el archivo " << nombreArchivo << ". Se asignaron 0 a las estadísticas." << endl;
+        }
+    }

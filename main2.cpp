@@ -21,9 +21,8 @@ int main()
         cout<<"2) Medio"<<endl;
         cout<<"3) Dificil"<<endl;
         cout<<" "<<endl;
-        cout<<"4) 2 jugadores"<<endl;
-        cout<<"5) Puntuaciones"<<endl;
-        cout<<"6) Cargar partida"<<endl;
+        cout<<"4) Puntuaciones"<<endl;
+        cout<<"5) Cargar partida"<<endl;
         cout<<"0) Salir"<<endl;cin>>opcion;
         switch (opcion)
         {
@@ -34,20 +33,20 @@ int main()
             comenzarJuego(sistema,"M");
             break;
         case 3:
-            cout<<"Opcion 3"<<endl;
+            comenzarJuego(sistema,"D");
             break;
         case 4:
+            cout<<"Puntuaciones"<<endl;
+            cout<<"El jugador a ganado: "<<sistema->getVictoriasJugador()<<" veces"<<endl;
+            cout<<"La CPU a ganado: "<<sistema->getVictoriasCPU()<<" veces"<<endl;
             break;
         case 5:
-            cout<<"Opcion 5"<<endl;
-            break;
-        case 6:
             sistema->cargarPartida();
             cout<<"Partida cargada"<<endl;
             comenzarJuego(sistema,"F");
             break;
         case 0:
-            cout<<"Opcion 0"<<endl;
+            cout<<"Has salido del programa!"<<endl;
             break;
         default:
             cout<<"ingrese una opcion valida"<<endl;
@@ -55,7 +54,7 @@ int main()
         }
         
     } while (opcion!=0);
-    
+    sistema->puntuaciones();
     return 0;
 }
 
@@ -81,10 +80,12 @@ void comenzarJuego(Sistema* sistema,string dificultad)
                 if(sistema->validarJugada(columna,1))
                 {
                     cout<<"Has ganado!!"<<endl;
+                    sistema->ganador(1);
                     break;
                 }
                 if(sistema->fichaCPU(dificultad))
                 {
+                    sistema->ganador(2);
                     cout<<"La CPU ha ganado!!"<<endl;
                     break;
                 }
