@@ -248,12 +248,12 @@ int evaluarLinea(int s1, int s2, int s3, int s4) {
 
     // Asignar puntajes según la cantidad de fichas en la línea
     if (fichasJugador == 4) puntaje += 100; // Ganador
-    else if (fichasJugador == 3 && fichasOponente == 0) puntaje += 5; // Tres fichas del jugador
-    else if (fichasJugador == 2 && fichasOponente == 0) puntaje += 2; // Dos fichas del jugador
+    else if (fichasJugador == 3 && fichasOponente == 0) puntaje += 5; 
+    else if (fichasJugador == 2 && fichasOponente == 0) puntaje += 2; 
 
     if (fichasOponente == 4) puntaje -= 100; // Oponente gana
-    else if (fichasOponente == 3 && fichasJugador == 0) puntaje -= 5; // Tres fichas del oponente
-    else if (fichasOponente == 2 && fichasJugador == 0) puntaje -= 2; // Dos fichas del oponente
+    else if (fichasOponente == 3 && fichasJugador == 0) puntaje -= 5; 
+    else if (fichasOponente == 2 && fichasJugador == 0) puntaje -= 2; 
 
     return puntaje;
 }
@@ -297,7 +297,6 @@ int Sistema::ingresarFichaCPU()
             *(*(tablero + i) + mejorJugada) = 2;
             return mejorJugada;
         }
-        //if(i=0)return 0;
     }
     return 0;
 }
@@ -471,8 +470,6 @@ void Sistema::cargarPartida()
                 *(*(tablero + i) + j) = 0;
             }
         }
-
-        // Leer los valores desde el archivo y actualizar el tablero
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 7; j++)
@@ -515,10 +512,9 @@ void Sistema::cargarPuntuaciones()
 
         if (archivo.is_open()) {
             archivo >> ganaJugador >> ganaCPU;
-            cout<<" Este puntaje tiene el jugador: "<<ganaJugador<<endl;
-            cout<<" Este puntaje tiene la CPU: "<<ganaCPU<<endl;
+            cout<<" Puntaje de jugador: "<<ganaJugador<<endl;
+            cout<<" Puntaje de la CPU: "<<ganaCPU<<endl;
             archivo.close();
-            cout << "Estadísticas cargadas desde el archivo " << nombreArchivo << endl;
         } else {
             // Si no se pudo abrir el archivo, asignamos 0 a ambas variables
             ganaJugador = 0;

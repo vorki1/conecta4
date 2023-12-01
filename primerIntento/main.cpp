@@ -447,6 +447,7 @@ int evaluarLinea(string c1, string c2, string c3, string c4) {
     return puntaje;
 }
 
+
 bool realizarJugada(string tablero[6][7],int columna,int jugador)
 {
     for (int i = 6; i >= 0; i--)
