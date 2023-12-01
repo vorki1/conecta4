@@ -1,2 +1,2 @@
-Victorias del Jugador: 2
-Victorias de la CPU: 0
+2
+0

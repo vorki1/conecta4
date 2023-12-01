@@ -65,7 +65,10 @@ void comenzarJuego(Sistema* sistema,string dificultad)
     do
     {
         cout<<"numero del 0 al 6: "<<endl;
+        cout<<" "<<endl;
+        cout<<"Ingrese el 8 para salir de la partida: "<<endl;
         cout<<"Ingrese el numero 9 para guardar la partida: "<<endl;cin>>columna;
+        if(columna==8)break;
         if(columna==9)
         {
             sistema->guardarPartida();
@@ -90,8 +93,6 @@ void comenzarJuego(Sistema* sistema,string dificultad)
                     break;
                 }
             }
-            
-            if(columna==5)bandera = false;
         }
     } while (bandera);
     sistema->setTablero();

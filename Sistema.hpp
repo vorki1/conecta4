@@ -497,8 +497,8 @@ void Sistema::puntuaciones()
 
     if (archivo.is_open())
     {
-        archivo << "Victorias del Jugador: " << getVictoriasJugador() << endl;
-        archivo << "Victorias de la CPU: " << getVictoriasCPU() << endl;
+        archivo <<getVictoriasJugador() << endl;
+        archivo <<getVictoriasCPU() << endl;
 
         archivo.close();
         cout << "Estadísticas guardadas en el archivo " << nombreArchivo << endl;
@@ -515,8 +515,8 @@ void Sistema::cargarPuntuaciones()
 
         if (archivo.is_open()) {
             archivo >> ganaJugador >> ganaCPU;
-            cout<<ganaJugador<<" Este puntaje tiene"<<endl;
-            cout<<ganaCPU<<" Este puntaje tiene"<<endl;
+            cout<<" Este puntaje tiene el jugador: "<<ganaJugador<<endl;
+            cout<<" Este puntaje tiene la CPU: "<<ganaCPU<<endl;
             archivo.close();
             cout << "Estadísticas cargadas desde el archivo " << nombreArchivo << endl;
         } else {
